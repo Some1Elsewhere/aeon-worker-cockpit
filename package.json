@@ -1,0 +1,10 @@
+{
+  "name": "aeon-worker-cockpit",
+  "version": "1.0.0",
+  "description": "Visual progress dashboard for claude-team/maniple workers",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}

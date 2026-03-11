@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aeon Worker Cockpit</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <h1>⬡ Aeon Worker Cockpit</h1>
+      <span class="header-sub">claude-team / maniple</span>
+    </div>
+    <div class="header-right">
+      <span id="conn-indicator" class="conn-indicator" title="Connection status"></span>
+      <span id="last-update" class="meta-text">--</span>
+      <button id="refresh-btn" class="btn-icon" title="Refresh now">&#8635;</button>
+    </div>
+  </header>
+
+  <section id="summary-bar" class="summary-bar">
+    <div class="stat">
+      <span class="stat-value" id="stat-total">--</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat stat-active">
+      <span class="stat-value" id="stat-active">--</span>
+      <span class="stat-label">Active</span>
+    </div>
+    <div class="stat stat-done">
+      <span class="stat-value" id="stat-done">--</span>
+      <span class="stat-label">Awaiting Review</span>
+    </div>
+    <div class="stat stat-stale">
+      <span class="stat-value" id="stat-stale">--</span>
+      <span class="stat-label">Stale</span>
+    </div>
+    <div class="stat stat-closed">
+      <span class="stat-value" id="stat-closed">--</span>
+      <span class="stat-label">Closed</span>
+    </div>
+  </section>
+
+  <main>
+    <section id="workers-section">
+      <h2>Workers</h2>
+      <div id="workers-grid" class="workers-grid">
+        <div class="empty-state">Connecting...</div>
+      </div>
+    </section>
+
+    <aside id="detail-panel" class="detail-panel hidden">
+      <div class="detail-header">
+        <h3 id="detail-title">Worker Details</h3>
+        <button id="detail-close" class="btn-icon btn-sm" title="Close panel">&times;</button>
+      </div>
+      <div id="detail-body" class="detail-body"></div>
+    </aside>
+
+    <section id="events-section">
+      <h2>Recent Events</h2>
+      <div id="events-list" class="events-list">
+        <div class="empty-state">Loading events...</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Message modal -->
+  <div id="msg-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Send Message</h3>
+        <button class="btn-icon btn-sm" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="msg-input" rows="3" placeholder="Type a message to send to this worker..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="msg-send-btn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
