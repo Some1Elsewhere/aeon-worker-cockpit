@@ -100,7 +100,8 @@ async function handleAPI(req, res) {
         return json(200, findObsidianNote(name));
       }
       if (url.pathname === "/api/claude-usage") {
-        const data = await claudeUsagePlugin.fetchUsage();
+        const forceRefresh = url.searchParams.get("refresh") === "1";
+        const data = await claudeUsagePlugin.getUsage({ forceRefresh });
         return json(200, data);
       }
     }

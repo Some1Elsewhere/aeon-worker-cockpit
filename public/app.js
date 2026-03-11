@@ -44,10 +44,10 @@ function usageLevel(n) {
 }
 
 function isResetPending(session) {
-  if (!session) return false;
+  if (!session?.resets_at) return false;
   const pct = Number(session.utilization);
-  const resetText = String(session.resets_in || "").trim().toLowerCase();
-  return pct >= 95 && (resetText === "0m" || resetText === "0h 0m" || resetText === "0m 0s");
+  const resetMs = new Date(session.resets_at).getTime();
+  return pct >= 95 && resetMs <= Date.now() + 60_000;
 }
 
 function esc(s) {
@@ -424,22 +424,26 @@ function renderAll() {
   // Claude usage badge
   const badge = document.getElementById("claude-usage-badge");
   if (badge) {
+    const usageError = claudeUsage?.error;
     const s = claudeUsage?.session?.utilization;
     const w = claudeUsage?.weekly?.utilization;
     const pendingReset = isResetPending(claudeUsage?.session);
-    const badgeLevel = pendingReset ? "warn" : ([usageLevel(s), usageLevel(w)].includes("crit") ? "crit" : ([usageLevel(s), usageLevel(w)].includes("warn") ? "warn" : ([usageLevel(s), usageLevel(w)].includes("ok") ? "ok" : "loading")));
+    const badgeLevel = usageError ? "crit" : (pendingReset ? "warn" : ([usageLevel(s), usageLevel(w)].includes("crit") ? "crit" : ([usageLevel(s), usageLevel(w)].includes("warn") ? "warn" : ([usageLevel(s), usageLevel(w)].includes("ok") ? "ok" : "loading"))));
     badge.className = `usage-badge ${badgeLevel}`;
-    document.getElementById("usage-session").textContent = s != null ? `${s}% session` : "--";
-    document.getElementById("usage-reset").textContent = claudeUsage?.session?.resets_in ? `resets in ${claudeUsage.session.resets_in}` : "--";
-    document.getElementById("usage-weekly").textContent = w != null ? `${w}% week` : "--";
+    document.getElementById("usage-session").textContent = usageError ? "usage error" : (s != null ? `${s}% session` : "--");
+    document.getElementById("usage-reset").textContent = usageError ? "provider failed" : (claudeUsage?.session?.resets_in ? `resets in ${claudeUsage.session.resets_in}` : "--");
+    document.getElementById("usage-weekly").textContent = usageError ? "check tooltip" : (w != null ? `${w}% week` : "--");
     const noteEl = document.getElementById("usage-note");
-    if (pendingReset) {
+    if (usageError) {
+      noteEl.classList.remove("hidden");
+      noteEl.textContent = "usage unavailable";
+    } else if (pendingReset) {
       noteEl.classList.remove("hidden");
       noteEl.textContent = "reset pending";
     } else {
       noteEl.classList.add("hidden");
     }
-    badge.title = claudeUsage?.session ? `Claude session ${s}% · resets in ${claudeUsage.session.resets_in} | weekly ${w}% · resets in ${claudeUsage.weekly.resets_in}` : "Claude Code usage";
+    badge.title = usageError ? `Claude usage provider error: ${usageError}` : (claudeUsage?.session ? `Claude session ${s}% · resets in ${claudeUsage.session.resets_in} | weekly ${w}% · resets in ${claudeUsage.weekly.resets_in}` : "Claude Code usage");
   }
 
   // Timestamp
@@ -463,7 +467,7 @@ async function poll() {
     ]);
     lastWorkers = workersRes.workers || [];
     lastEvents = eventsRes.events || [];
-    claudeUsage = usageRes && !usageRes.error ? usageRes : null;
+    claudeUsage = usageRes || { error: 'usage unavailable' };
     connOk = true;
 
     // Refresh examine cache for selected worker
