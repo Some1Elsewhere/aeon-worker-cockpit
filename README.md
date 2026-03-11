@@ -5,8 +5,8 @@ Visual mission-control dashboard for `claude-team` / `maniple` workers in an Ope
 ## Quickstart
 
 ```bash
-git clone <your-repo-url> aeon-worker-cockpit
-cd aeon-worker-cockpit
+git clone <your-repo-url> ai-agent-status-cockpit
+cd ai-agent-status-cockpit
 cp .env.example .env   # optional
 ./run.sh
 ```
@@ -63,8 +63,8 @@ No database. No cloud deploy. No auth layer. Just local infrastructure talking t
 ## 1. Clone or copy the repo
 
 ```bash
-git clone <your-repo-url> aeon-worker-cockpit
-cd aeon-worker-cockpit
+git clone <your-repo-url> ai-agent-status-cockpit
+cd ai-agent-status-cockpit
 ```
 
 If you are using the copy that was created inside an OpenClaw workspace, just `cd` into it.
@@ -148,6 +148,8 @@ The cockpit does **not** spawn workers by itself. It visualizes an existing work
 
 The easiest compatible backend is the local `claude-team` / `maniple` HTTP service.
 
+Important: this backend must be **enabled and running** before the cockpit can show anything useful. Installing the cockpit alone is not enough.
+
 ### Example backend command
 
 This is the service model used in the current setup:
@@ -182,6 +184,8 @@ Example:
 
 ## E. Verify the backend connection
 
+Before starting the cockpit, confirm that your worker backend is actually live and exposed through `mcporter`.
+
 Run:
 
 ```bash
@@ -197,6 +201,8 @@ You should see worker tools like:
 - `close_workers`
 
 If that works, the cockpit has what it needs.
+
+If it does **not** work, stop there and fix the backend first — the cockpit is only a viewer/control surface for an already-working worker system.
 
 ## F. Start AI Agent Status Cockpit
 
