@@ -422,6 +422,7 @@ function renderAll() {
     const badgeLevel = [usageLevel(s), usageLevel(w)].includes("crit") ? "crit" : ([usageLevel(s), usageLevel(w)].includes("warn") ? "warn" : ([usageLevel(s), usageLevel(w)].includes("ok") ? "ok" : "loading"));
     badge.className = `usage-badge ${badgeLevel}`;
     document.getElementById("usage-session").textContent = s != null ? `${s}% session` : "--";
+    document.getElementById("usage-reset").textContent = claudeUsage?.session?.resets_in ? `resets in ${claudeUsage.session.resets_in}` : "--";
     document.getElementById("usage-weekly").textContent = w != null ? `${w}% week` : "--";
     badge.title = claudeUsage?.session ? `Claude session ${s}% · resets in ${claudeUsage.session.resets_in} | weekly ${w}% · resets in ${claudeUsage.weekly.resets_in}` : "Claude Code usage";
   }

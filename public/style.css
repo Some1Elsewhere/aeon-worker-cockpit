@@ -72,6 +72,10 @@ h1 { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
   font-weight: 700;
   color: var(--text);
 }
+.usage-reset {
+  font-size: 11px;
+  color: var(--text-dim);
+}
 .usage-subvalue {
   font-size: 11px;
   color: var(--text-dim);
