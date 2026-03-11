@@ -27,6 +27,7 @@ Before this app can do anything useful, you need:
 - **OpenClaw** installed and working
 - **Claude Code** installed and logged in
 - **mcporter** installed
+- optional: the `claude-code-usage` script/skill if you want the Claude usage badge in the header
 - a compatible worker backend that is **enabled and running**
   - typically `claude-team` / `maniple`
 - an MCP profile in `mcporter` that points to that backend
@@ -62,6 +63,7 @@ Important: this app is a **viewer/control surface**, not the worker backend itse
   - send a message to a worker
   - dismiss / close workers
 - optionally checks whether a likely Obsidian session note exists
+- shows a compact Claude Code usage badge in the header when the `claude-code-usage` script is available
 
 ## Stack
 

@@ -7,6 +7,7 @@ const os = require("node:os");
 const PORT = process.env.PORT || 7700;
 const OBSIDIAN_VAULT = process.env.OBSIDIAN_VAULT || path.join(os.homedir(), "obsidian-vault");
 const MCP_SERVER = process.env.MCP_SERVER || "claude-team-http";
+const CLAUDE_USAGE_SCRIPT = process.env.CLAUDE_USAGE_SCRIPT || path.join(__dirname, "..", "..", "skills", "claude-code-usage", "scripts", "claude-usage.sh");
 
 // Shell out to mcporter to call the configured MCP worker server
 function mcporterCall(tool, args = {}) {
@@ -65,6 +66,22 @@ function readBody(req) {
   });
 }
 
+function readClaudeUsage() {
+  return new Promise((resolve, reject) => {
+    execFile(CLAUDE_USAGE_SCRIPT, ["--json"], { timeout: 15000 }, (err, stdout, stderr) => {
+      if (err) {
+        reject(new Error(`claude usage failed: ${stderr || err.message}`));
+        return;
+      }
+      try {
+        resolve(JSON.parse(stdout));
+      } catch {
+        reject(new Error("claude usage returned invalid JSON"));
+      }
+    });
+  });
+}
+
 async function handleAPI(req, res) {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const json = (code, data) => {
@@ -96,6 +113,10 @@ async function handleAPI(req, res) {
         const name = url.searchParams.get("name");
         if (!name) return json(400, { error: "missing name param" });
         return json(200, findObsidianNote(name));
+      }
+      if (url.pathname === "/api/claude-usage") {
+        const data = await readClaudeUsage();
+        return json(200, data);
       }
     }
 

@@ -4,6 +4,7 @@ const STALE_THRESHOLD_MIN = 10;
 let selectedSid = null;
 let examineCache = {};
 let obsidianCache = {};
+let claudeUsage = null;
 
 // ── Helpers ──
 
@@ -32,6 +33,14 @@ function shortPath(p) {
   const idx = parts.indexOf(".worktrees");
   if (idx >= 0) return ".worktrees/" + parts.slice(idx + 1).join("/");
   return parts.slice(-2).join("/");
+}
+
+function usageLevel(n) {
+  if (n == null || Number.isNaN(Number(n))) return "loading";
+  const v = Number(n);
+  if (v > 80) return "crit";
+  if (v > 50) return "warn";
+  return "ok";
 }
 
 function esc(s) {
@@ -405,6 +414,18 @@ function renderAll() {
   // Events
   document.getElementById("events-list").innerHTML = renderEvents(lastEvents);
 
+  // Claude usage badge
+  const badge = document.getElementById("claude-usage-badge");
+  if (badge) {
+    const s = claudeUsage?.session?.utilization;
+    const w = claudeUsage?.weekly?.utilization;
+    const badgeLevel = [usageLevel(s), usageLevel(w)].includes("crit") ? "crit" : ([usageLevel(s), usageLevel(w)].includes("warn") ? "warn" : ([usageLevel(s), usageLevel(w)].includes("ok") ? "ok" : "loading"));
+    badge.className = `usage-badge ${badgeLevel}`;
+    document.getElementById("usage-session").textContent = s != null ? `${s}% session` : "--";
+    document.getElementById("usage-weekly").textContent = w != null ? `${w}% week` : "--";
+    badge.title = claudeUsage?.session ? `Claude session ${s}% · resets in ${claudeUsage.session.resets_in} | weekly ${w}% · resets in ${claudeUsage.weekly.resets_in}` : "Claude Code usage";
+  }
+
   // Timestamp
   document.getElementById("last-update").textContent = "updated " + new Date().toLocaleTimeString("en-GB");
 
@@ -419,12 +440,14 @@ function renderAll() {
 
 async function poll() {
   try {
-    const [workersRes, eventsRes] = await Promise.all([
+    const [workersRes, eventsRes, usageRes] = await Promise.all([
       fetch("/api/workers").then((r) => r.json()),
       fetch("/api/events").then((r) => r.json()),
+      fetch("/api/claude-usage").then((r) => r.json()).catch(() => null),
     ]);
     lastWorkers = workersRes.workers || [];
     lastEvents = eventsRes.events || [];
+    claudeUsage = usageRes && !usageRes.error ? usageRes : null;
     connOk = true;
 
     // Refresh examine cache for selected worker
