@@ -19,6 +19,22 @@ This app exists to solve one annoying problem: spawned workers are often **doing
 
 The repo is intentionally portable: avoid machine-specific absolute paths, keep configuration in env vars, and treat the worker MCP profile as configurable.
 
+## What you need
+
+Before this app can do anything useful, you need:
+
+- **Node.js**
+- **OpenClaw** installed and working
+- **Claude Code** installed and logged in
+- **mcporter** installed
+- a compatible worker backend that is **enabled and running**
+  - typically `claude-team` / `maniple`
+- an MCP profile in `mcporter` that points to that backend
+  - for example: `claude-team-http`
+- **Obsidian** is optional, but recommended if you want worker/session note detection
+
+Important: this app is a **viewer/control surface**, not the worker backend itself.
+
 ## Screenshot
 
 ![AI Agent Status Cockpit live view](docs/worker-cockpit-live.png)
@@ -236,7 +252,8 @@ The current server implementation is built around the following MCP calls on the
 
 ## Important note about tool names
 
-If your MCP server uses different tool names than the current `claude-team-http` profile, update `server.js` accordingly.
+If your MCP server uses a different profile name than `claude-team-http`, set `MCP_SERVER`.
+If it uses different tool names entirely, you will need to adapt `server.js`.
 
 The app is intentionally small so this kind of adaptation is easy.
 
